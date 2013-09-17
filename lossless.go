@@ -1,3 +1,8 @@
+// json-lossless populates structs from JSON and allows serialization
+// back to JSON without losing fields that are not explicitly defined
+// in the struct.
+//
+// Source code: https://github.com/joeshaw/json-lossless
 package lossless
 
 import (
@@ -9,6 +14,27 @@ import (
 	"github.com/joeshaw/go-simplejson"
 )
 
+// The JSON type contains the state of the decoded data.  Embed this
+// type in your type and implement MarshalJSON and UnmarshalJSON
+// methods to add lossless encoding and decoding.
+//
+// Example:
+//
+//    type Person struct {
+//        lossless.JSON `json:"-"`
+//
+//        Name    string
+//        Age     int
+//        Address string
+//    }
+//
+//    func (p *Person) UnmarshalJSON(data []byte) error {
+//        return p.JSON.UnmarshalJSON(p, data)
+//    }
+//
+//    func (p Person) MarshalJSON() ([]byte, error) {
+//        return p.JSON.MarshalJSON(p)
+//    }
 type JSON struct {
 	json *simplejson.Json
 }
@@ -19,7 +45,14 @@ func (js *JSON) maybeInit() {
 	}
 }
 
-// Sets a value in a JSON object by the given path.
+// Sets a JSON value not represented in the struct type.  The
+// argument list is a set of strings referring to the JSON path,
+// with the value to be set as the last value.
+//
+// Example:
+//
+//    // This sets {"Phone": {"Mobile": "614-555-1212"}} in the JSON
+//    p.Set("Phone", "Mobile", "614-555-1212")
 func (js *JSON) Set(args ...interface{}) error {
 	js.maybeInit()
 
@@ -54,6 +87,14 @@ func (js *JSON) Set(args ...interface{}) error {
 	return nil
 }
 
+// Unmarshals JSON data into the given destination.  Users should
+// call this from their type's UnmarshalJSON method.
+//
+// Example:
+//
+//     func (p *Person) UnmarshalJSON(data []byte) error {
+//         return p.JSON.UnmarshalJSON(p, data)
+//     }
 func (js *JSON) UnmarshalJSON(dest interface{}, data []byte) error {
 	j, err := simplejson.NewJson(data)
 	if err != nil {
@@ -64,6 +105,14 @@ func (js *JSON) UnmarshalJSON(dest interface{}, data []byte) error {
 	return syncToStruct(dest, j)
 }
 
+// Marshals the given source into JSON data.  Users should
+// call this from their type's MarshalJSON method.
+//
+// Example:
+//
+//     func (p Person) MarshalJSON() ([]byte, error) {
+//         return p.JSON.MarshalJSON(p)
+//     }
 func (js *JSON) MarshalJSON(src interface{}) ([]byte, error) {
 	js.maybeInit()
 	err := syncFromStruct(src, js.json)

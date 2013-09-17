@@ -14,11 +14,14 @@ of cases.  Pull requests very welcome.
 
 ## API ##
 
+Full API docs are on [GoDoc](http://godoc.org/github.com/joeshaw/json-lossless):
+http://godoc.org/github.com/joeshaw/json-lossless
+
 To get started, embed a `lossless.JSON` inside your struct:
 
 ```go
 type Person struct {
-	JSON `json:"-"`
+        lossless.JSON `json:"-"`
 
 	Name      string `json:"name"`
 	Age       int    `json:"age"`
@@ -72,6 +75,20 @@ if bytes.Index(data, "Extra") == -1 {
 
 fmt.Println(string(data))
 
+```
+
+You can also set arbitrary key/values on your struct by calling
+`Set()`:
+
+```go
+p.Set("Extra", "AgeString", "forty-two")
+```
+
+When serialized, `Extra` will look like this:
+
+```json
+{ ...
+  "Extra": {"foo": "bar", "AgeString": "forty-two"}}
 ```
 
 ## Known issues ##
