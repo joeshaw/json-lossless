@@ -11,7 +11,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/joeshaw/go-simplejson"
+	"github.com/bitly/go-simplejson"
 )
 
 // The JSON type contains the state of the decoded data.  Embed this
