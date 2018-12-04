@@ -6,8 +6,6 @@ not explicitly defined in the struct.
 
 json-lossless builds off of bit.ly's excellent
 [go-simplejson](https://github.com/bitly/go-simplejson) package.
-However, until bitly/go-simplejson#17 is merged, it requires my
-fork of the package.
 
 json-lossless is experimental and probably doesn't work in a lot
 of cases.  Pull requests very welcome.
